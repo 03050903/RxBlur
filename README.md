@@ -24,7 +24,6 @@
 - **RxAnimatorBlurActivity：** RxJava + Picasso + Animator(TypeEvaluator)
 
 
-
 **Summary**
 -----------------
 
@@ -33,6 +32,7 @@
 如果您对RxJava更感兴趣，可以按照我的实现思路，扩展自己需要的“RxBinding”。
 
 如果，您发现了它的不当之处或者更好地实现思路与方案，请联系我，谢谢。
+
 
 **Developed By**
 -----------------
@@ -54,6 +54,7 @@
 <a href="http://www.imooc.com/myclub/myquestion/t/ques">
   <img alt="Follow me on imooc" src="http://upload-images.jianshu.io/upload_images/268450-c5ee5ee33332629f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" />
 </a>
+
 
 **Acknowledgments**
 -----------------
