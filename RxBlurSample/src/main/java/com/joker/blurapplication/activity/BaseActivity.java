@@ -10,6 +10,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import com.joker.blurapplication.MyApplication;
 import com.joker.blurapplication.R;
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 import rx.subscriptions.CompositeSubscription;
@@ -62,6 +63,7 @@ public abstract class BaseActivity extends RxAppCompatActivity {
     BaseActivity.this.unSubscribe();
     super.onDestroy();
     ButterKnife.unbind(BaseActivity.this);
+    MyApplication.get().getRefWatcher().watch(this);
   }
 
   protected void unSubscribe() {

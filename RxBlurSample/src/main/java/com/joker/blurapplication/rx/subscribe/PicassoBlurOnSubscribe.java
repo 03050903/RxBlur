@@ -48,12 +48,13 @@ public class PicassoBlurOnSubscribe implements Observable.OnSubscribe<Bitmap> {
       }
     };
 
-    Picasso.with(context)//
-        .load(resId)//
-        .noFade()//
-        .memoryPolicy(NO_CACHE, NO_STORE)//
-        .config(Bitmap.Config.ARGB_8888)//
-        .transform(new PicassoTransformation(context, radius))//
+    Picasso
+        .with(context)
+        .load(resId)
+        .noFade()
+        .memoryPolicy(NO_CACHE, NO_STORE)
+        .config(Bitmap.Config.ARGB_8888)
+        .transform(new PicassoTransformation(context, radius))
         .into(target);
 
     subscriber.add(new MainThreadSubscription() {

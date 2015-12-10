@@ -2,6 +2,7 @@ package com.joker.blurapplication;
 
 import android.app.Application;
 import android.os.StrictMode;
+import com.squareup.leakcanary.LeakCanary;
 import com.squareup.leakcanary.RefWatcher;
 
 import static android.os.Build.VERSION.SDK_INT;
@@ -29,7 +30,7 @@ public class MyApplication extends Application {
     instance = (MyApplication) getApplicationContext();
 
     MyApplication.this.enabledStrictMode();
-    //refWatcher = LeakCanary.install(this);
+    refWatcher = LeakCanary.install(this);
   }
 
   private void enabledStrictMode() {

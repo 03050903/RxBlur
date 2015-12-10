@@ -1,19 +1,26 @@
 package com.joker.blurapplication.rx.subscribe;
 
 import android.content.Context;
-import android.graphics.Bitmap;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
+import android.util.Log;
+
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.FutureTarget;
 import com.jakewharton.rxbinding.internal.MainThreadSubscription;
 import com.jakewharton.rxbinding.internal.Preconditions;
-import com.joker.blurapplication.other.util.ExecutorUtil;
-import com.joker.blurapplication.other.transformation.GlideTransformation;
 import com.joker.blurapplication.other.IntegerVersionSignature;
+import com.joker.blurapplication.other.transformation.GlideTransformation;
+import com.joker.blurapplication.other.util.ExecutorUtil;
+
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.FutureTask;
+
 import rx.Observable;
 import rx.Subscriber;
 import rx.subscriptions.Subscriptions;
@@ -29,6 +36,8 @@ public class GlideBlurOnSubscribe implements Observable.OnSubscribe<GlideDrawabl
   private int radius;
   private Executor cacheExecutor;
 
+  private Handler mainHandler = new Handler(Looper.getMainLooper());
+
   public GlideBlurOnSubscribe(@NonNull Context context, @DrawableRes int resId, int radius) {
     this.context = context;
     this.resId = resId;
@@ -39,20 +48,80 @@ public class GlideBlurOnSubscribe implements Observable.OnSubscribe<GlideDrawabl
   @Override public void call(final Subscriber<? super GlideDrawable> subscriber) {
     Preconditions.checkUiThread();
 
+    MyFutureTask futureTask = null;
     if (!subscriber.isUnsubscribed()) {
-      FutureTask<Bitmap> futureTask =
-          new FutureTask<>(GlideBlurOnSubscribe.this.futureRunnable(subscriber), null);
+
+      futureTask = new MyFutureTask(new MyCallback(subscriber));
       cacheExecutor.execute(futureTask);
       subscriber.add(Subscriptions.from(futureTask));
+
+      /*FutureTask<Bitmap> futureTask =
+          new FutureTask<>(GlideBlurOnSubscribe.this.futureRunnable(subscriber), null);
+      cacheExecutor.execute(futureTask);
+      subscriber.add(Subscriptions.from(futureTask));*/
     }
 
+    final MyFutureTask finalFutureTask = futureTask;
     subscriber.add(new MainThreadSubscription() {
       @Override protected void onUnsubscribe() {
 
-        Glide.get(context).getBitmapPool().clearMemory();
+        Log.e(TAG, "onUnsubscribe: ");
+
+        if (finalFutureTask != null) {
+          finalFutureTask.callback.futureTarget.clear();
+        }
+
+        mainHandler.removeCallbacksAndMessages(null);
         GlideBlurOnSubscribe.this.context = null;
       }
     });
+  }
+
+  class MyFutureTask extends FutureTask<GlideDrawable> {
+
+    private MyCallback callback;
+
+    public MyFutureTask(Callable<GlideDrawable> callable) {
+      super(callable);
+      this.callback = (MyCallback) callable;
+    }
+
+    @Override protected void done() {
+
+      mainHandler.post(new Runnable() {
+        @Override public void run() {
+          try {
+            if (isDone() && !isCancelled()) {
+              callback.subscriber.onNext(get());
+            }
+          } catch (InterruptedException | ExecutionException e) {
+            callback.subscriber.onError(e);
+          }
+        }
+      });
+    }
+  }
+
+  class MyCallback implements Callable<GlideDrawable> {
+
+    private Subscriber<? super GlideDrawable> subscriber;
+    private FutureTarget<GlideDrawable> futureTarget;
+
+    public MyCallback(Subscriber<? super GlideDrawable> subscriber) {
+      this.subscriber = subscriber;
+    }
+
+    @Override public GlideDrawable call() throws Exception {
+
+      futureTarget = Glide
+          .with(context)
+          .load(resId)
+          .signature(new IntegerVersionSignature(System.identityHashCode(System.currentTimeMillis())))
+          .bitmapTransform(
+              new GlideTransformation(context, Glide.get(context).getBitmapPool(), radius)) .into(-1, -1);
+
+      return futureTarget.get();
+    }
   }
 
   private Runnable futureRunnable(final Subscriber<? super GlideDrawable> subscriber) {
@@ -63,12 +132,15 @@ public class GlideBlurOnSubscribe implements Observable.OnSubscribe<GlideDrawabl
         if (!subscriber.isUnsubscribed()) {
 
           try {
-            GlideDrawable glideDrawable = Glide.with(context)
+            GlideTransformation glideTransformation =
+                new GlideTransformation(context, Glide.get(context).getBitmapPool(), radius);
+
+            GlideDrawable glideDrawable = Glide
+                .with(context)
                 .load(resId)
                 .signature(new IntegerVersionSignature(
                     System.identityHashCode(System.currentTimeMillis())))
-                .bitmapTransform(
-                    new GlideTransformation(context, Glide.get(context).getBitmapPool(), radius))
+                .bitmapTransform(glideTransformation)
                 .into(-1, -1)
                 .get();
 

@@ -31,6 +31,7 @@ public abstract class LazyBaseActivity extends RxAppCompatActivity {
     return false;
   }
 
+
   @Override protected void onDestroy() {
     super.onDestroy();
     ButterKnife.unbind(LazyBaseActivity.this);
