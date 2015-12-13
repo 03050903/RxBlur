@@ -79,7 +79,7 @@ public class GlideBlurActivity extends BaseActivity implements BlurInterface {
     return R.layout.activity_simple_layout;
   }
 
-  @Override public void setupToolbar() {
-    getSupportActionBar().setTitle("Picasso Blur");
+  @Override public void setupActionBar() {
+    getSupportActionBar().setTitle("Glide Blur");
   }
 }

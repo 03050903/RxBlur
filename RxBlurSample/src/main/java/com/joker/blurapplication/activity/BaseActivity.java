@@ -38,7 +38,7 @@ public abstract class BaseActivity extends RxAppCompatActivity {
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(BaseActivity.this.getLayoutId());
-    BaseActivity.this.setupToolbar();
+    BaseActivity.this.setupActionBar();
 
     if (BaseActivity.this instanceof BlurInterface) {
       ((BlurInterface) BaseActivity.this).loadBlurBitmap();
@@ -72,5 +72,5 @@ public abstract class BaseActivity extends RxAppCompatActivity {
 
   public abstract int getLayoutId();
 
-  public abstract void setupToolbar();
+  public abstract void setupActionBar();
 }

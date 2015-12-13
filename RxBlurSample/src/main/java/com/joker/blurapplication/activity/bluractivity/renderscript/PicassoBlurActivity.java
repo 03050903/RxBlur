@@ -6,7 +6,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.TransitionDrawable;
 import android.support.v7.app.AppCompatActivity;
-
 import com.joker.blurapplication.R;
 import com.joker.blurapplication.activity.BaseActivity;
 import com.joker.blurapplication.activity.BlurInterface;
@@ -15,7 +14,6 @@ import com.joker.blurapplication.rx.RxBlurEffective;
 import com.joker.blurapplication.rx.SchedulersCompat;
 import com.joker.blurapplication.rx.SimpleSubscriber;
 import com.trello.rxlifecycle.ActivityEvent;
-
 import rx.Observable;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
@@ -100,7 +98,7 @@ public class PicassoBlurActivity extends BaseActivity implements BlurInterface {
     return R.layout.activity_simple_layout;
   }
 
-  @Override public void setupToolbar() {
+  @Override public void setupActionBar() {
     getSupportActionBar().setTitle("Picasso Blur");
   }
 }

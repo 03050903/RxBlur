@@ -58,5 +58,4 @@
       android:inflatedId="@+id/main_layout_blur_iv"
       />
 
-
 </FrameLayout>
